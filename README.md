@@ -59,3 +59,19 @@ sharpen_kd/
 ├── model_checkpoints/
 ├── inference_samples/sharpened_test_outputs/
 └── .gitignore
+
+# Setup and Installation 🛠️
+
+## Prerequisites
+
+* Python 3.x
+* Git
+
+## Cloning the Repository
+
+First, clone this repository along with its Git submodule:
+
+```bash
+git clone [https://github.com/your-username/sharpen_kd.git](https://github.com/your-username/sharpen_kd.git)
+cd sharpen_kd
+git submodule update --init --recursive
