@@ -6,7 +6,9 @@
 Welcome to the **Image Sharpening** project! ✨ This repository hosts my internship work focused on building a **lightweight, high-performance image sharpening solution** using **Knowledge Distillation (KD)**. The goal is to replicate the quality of a powerful teacher model (Restormer) with a compact student model, ideal for real-time use cases like **video conferencing**.
 
 ## Outputs 
+
 ![Sharpened Output Example](GoPro_dataset/train/Screenshot 2025-07-12 130747.png)
+
 ---
 
 ## 📚 Table of Contents
