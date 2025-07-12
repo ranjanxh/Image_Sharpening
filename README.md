@@ -27,8 +27,6 @@ Welcome to the Image Sharpening repository! ✨ This project focuses on developi
     * [Training Process](#training-process)
 * [Inference 🚀](#inference-🚀)
 * [Performance Evaluation 📈](#performance-evaluation-📈)
-* [Future Work 💡](#future-work-💡)
-* [License 📄](#license-📄)
 
 ---
 
