@@ -5,7 +5,10 @@
 
 Welcome to the **Image Sharpening** project! ✨ This repository hosts my internship work focused on building a **lightweight, high-performance image sharpening solution** using **Knowledge Distillation (KD)**. The goal is to replicate the quality of a powerful teacher model (Restormer) with a compact student model, ideal for real-time use cases like **video conferencing**.
 
-![Sharpening Example](https://user-images.githubusercontent.com/12345678/placeholder-image.png) <!-- Replace with actual image link -->
+| Original Blurry Image | Sharpened Image (Teacher Model) | Sharpened Image (Student Model) | 
+| :-------------------- | :------------------------------ |
+| ![Blurry Image 1](GoPro_dataset/test/blurred/GOPR0862_11_00-000021.png) | ![Sharpened Image 1](GoPro_dataset/test/sharp/GOPR0862_11_00-000021.png) | ![Sharpened Image 1](https://drive.google.com/file/d/1fuXzL7bj4yemX4fulQJ5oiYkkschnmf7/view?usp=sharing) |
+| ![Blurry Image 2](GoPro_dataset/test/blurred/GOPR0881_11_01-000204.png) | ![Sharpened Image 2](GoPro_dataset/test/sharp/GOPR0881_11_01-000204.png) | ![Sharpened Image 2](https://drive.google.com/file/d/1LDBDZrk2fYvqIYXMLWv_WgcpDt--uYY3/view?usp=sharing) |
 
 ---
 
