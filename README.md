@@ -7,26 +7,26 @@ The full internship report detailing this project is available within this repos
 Welcome to the Image Sharpening repository! ✨ This project focuses on developing an efficient and high-quality image sharpening solution using **Knowledge Distillation (KD)**. My goal is to train a lightweight model that can achieve impressive visual results by learning from a more complex, pre-trained teacher model, making it suitable for real-time applications like video conferencing.
 
 ---
-
 📚 Table of Contents
-* [Project Overview](##project-overview)
-* [Visual Showcase](##visual-showcase-📸)
-* [Features 🚀](##features-🚀)
-* [Project Structure 📁](##project-structure-📁)
-* [Setup and Installation 🛠️](##setup-and-installation-🛠️)
-    * [Prerequisites](###prerequisites)
-    * [Cloning the Repository](###cloning-the-repository)
-    * [Python Dependencies](###python-dependencies)
-    * [Restormer Pre-trained Weights](###restormer-pre-trained-weights)
-* [Dataset 📊](##dataset-📊)
-* [Models 🧠](##models-🧠)
-    * [Teacher Model: Restormer](##teacher-model-restormer)
-    * [Student Model: Lightweight U-Net with SE Blocks](##student-model-lightweight-u-net-with-se-blocks)
-* [Training 🏋️‍♀️](##training-🏋️‍♀️)
-    * [Loss Functions](###loss-functions)
-    * [Training Process](###training-process)
-* [Inference 🚀](##inference-🚀)
-* [Performance Evaluation 📈](##performance-evaluation-📈)
+* [Project Overview](#project-overview)
+* [Visual Showcase 📸](#visual-showcase-)
+* [Features 🚀](#features-)
+* [Project Structure 📁](#project-structure-)
+* [Setup and Installation 🛠️](#setup-and-installation-️)
+    * [Prerequisites](#prerequisites)
+    * [Cloning the Repository](#cloning-the-repository)
+    * [Python Dependencies](#python-dependencies)
+    * [Restormer Pre-trained Weights](#restormer-pre-trained-weights)
+* [Dataset 📊](#dataset-)
+* [Models 🧠](#models-)
+    * [Teacher Model: Restormer](#teacher-model-restormer)
+    * [Student Model: Lightweight U-Net with SE Blocks](#student-model-lightweight-u-net-with-se-blocks)
+* [Training 🏋️‍♀️](#training-️)
+    * [Loss Functions](#loss-functions)
+    * [Training Process](#training-process)
+* [Inference 🚀](#inference-)
+* [Performance Evaluation 📈](#performance-evaluation-)
+
 
 ---
 
