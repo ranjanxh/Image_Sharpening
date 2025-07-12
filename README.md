@@ -47,18 +47,15 @@ Showcase a clear comparison between the original blurry input images and the sha
 
 | Original Blurry Image | Sharpened Image (Student Model) |
 |---|---|
-| ![Original Blurry Image 1](path/to/blurry_image_1.jpg) | ![Sharpened Image 1](path/to/sharpened_image_1.jpg) |
-| ![Original Blurry Image 2](path/to/blurry_image_2.jpg) | ![Sharpened Image 2](path/to/sharpened_image_2.jpg) |
-| ![Original Blurry Image 3](path/to/blurry_image_3.jpg) | ![Sharpened Image 3](path/to/sharpened_image_3.jpg) |
-| ![Original Blurry Image 4](path/to/blurry_image_4.jpg) | ![Sharpened Image 4](path/to/sharpened_image_4.jpg) |
-| ![Original Blurry Image 5](path/to/blurry_image_5.jpg) | ![Sharpened Image 5](path/to/sharpened_image_5.jpg) |
+| ![Original Blurry Image 1](GoPro_dataset/test/blurred/GOPR0384_11_00-000001.png) | ![Sharpened Image 1](inference_samples/sharpened_test_outputs/GOPR0384_11_00-000001.png) |
+| ![Original Blurry Image 2](GoPro_dataset/test/blurred/GOPR0384_11_05-004081.png) | ![Sharpened Image 2](inference_samples/sharpened_test_outputs/GOPR0384_11_05-004081.png) |
+| ![Original Blurry Image 3](GoPro_dataset/test/blurred/GOPR0385_11_01-003105.png) | ![Sharpened Image 3](inference_samples/sharpened_test_outputs/GOPR0385_11_01-003105.png) |
+| ![Original Blurry Image 4](GoPro_dataset/test/blurred/GOPR0881_11_01-000252.png) | ![Sharpened Image 4](inference_samples/sharpened_test_outputs/GOPR0881_11_01-000252.png) |
+| ![Original Blurry Image 5](GoPro_dataset/test/blurred/GOPR0396_11_00-000085.png) | ![Sharpened Image 5](inference_samples/sharpened_test_outputs/GOPR0396_11_00-000085.png) |
 
-*(Add more rows for additional examples)*
 
-### Dataset Sample (Optional)
-You could also include a small collage or a few examples from the GoPro dataset itself to illustrate the type of data used for training.
 
-![GoPro Dataset Sample](path/to/dataset_sample.jpg)
+
 
 ---
 
@@ -144,12 +141,13 @@ This project utilizes the **GoPro dataset** (or a similar dataset structured lik
 
 ### Structure:
 Ensure your dataset is organized within the `GoPro_dataset/` directory as follows:
-<image>
+![Project Structure](GoPro_dataset/train/Screenshot 2025-07-12 130839.png)
 '
 ## Models 🧠
 
 ### Teacher Model: Restormer
 The teacher model is a pre-trained **Restormer** network, a powerful transformer-based architecture specifically designed for image restoration tasks like deblurring. It provides high-quality feature representations and outputs that the student model learns to mimic through knowledge distillation.
+![Network Architecture](https://camo.githubusercontent.com/e3bc102b8c1633c56e38549b4afcc09ed9988cd29bd3edf7d94a97f29f3fe123/68747470733a2f2f692e696d6775722e636f6d2f756c4c6f4569672e706e67)
 
 ### Student Model: Lightweight U-Net with SE Blocks
 The student model is a custom-designed, lightweight **U-Net variant integrated with Squeeze-and-Excitation (SE) blocks**.
@@ -213,9 +211,4 @@ The performance of the trained student model is evaluated using standard image q
 The evaluation results, including PSNR, SSIM, and FPS, will be detailed in the full internship report.
 
 
----
-
-## License 📄
-
-This project is licensed under the [Specify your License, e.g., MIT License]. See the `LICENSE` file for more details.
 
