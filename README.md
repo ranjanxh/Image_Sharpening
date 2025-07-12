@@ -198,7 +198,14 @@ After training, you can use the trained student model to sharpen new blurry imag
 
 ---
 
-## Performance Evaluation 📈
+## 📈 Performance Evaluation
+
+| **Metric**                          | **Student Model**   |
+|-------------------------------------|---------------------|
+| 1. SSIM                             | 0.9120              |
+| 2. PSNR                             | 28.4293 dB          |
+| 3. FPS (512×512, no tiling)         | 45 FPS              |
+| 4. FPS (1920×1080, with tiling)     | 12 FPS              |
 
 The performance of the trained student model is evaluated using standard image quality metrics and speed measurements:
 
@@ -206,7 +213,8 @@ The performance of the trained student model is evaluated using standard image q
 * **Structural Similarity Index Measure (SSIM)**: A metric that assesses the similarity between two images, considering luminance, contrast, and structure. Values closer to 1 indicate higher similarity.
 * **Frames Per Second (FPS)**: Measures the inference speed of the model, crucial for real-time applications.
 
-The evaluation results, including PSNR, SSIM, and FPS, will be detailed in the full internship report.
+
+
 
 
 
