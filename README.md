@@ -3,6 +3,9 @@
 
 
 The full internship report detailing this project is available within this repository.
+📄 [View Full Report (PDF)](Project%20Report%20Intel%20Unnati%20Summer%20Training.pdf)
+
+
 
 Welcome to the Image Sharpening repository! ✨ This project focuses on developing an efficient and high-quality image sharpening solution using **Knowledge Distillation (KD)**. My goal is to train a lightweight model that can achieve impressive visual results by learning from a more complex, pre-trained teacher model, making it suitable for real-time applications like video conferencing.
 
