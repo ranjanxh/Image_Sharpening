@@ -3,7 +3,7 @@
 
 
 The full internship report detailing this project is available within this repository.
-📄 [View Full Report (PDF)](Project_Report_Intel_Unnati_Summer_Training.pdf)
+📄 [View Full Report (PDF)](Project_Report_Intel_Summer_Training_compressed.pdf)
 
 
 
