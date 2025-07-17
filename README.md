@@ -41,7 +41,6 @@ This project implements an **image sharpening solution leveraging Knowledge Dist
 
 ## Visual Showcase 📸
 
-Here, you can add compelling visual examples to demonstrate the effectiveness of your sharpening model.
 
 ### Before & After Examples
 Showcase a clear comparison between the original blurry input images and the sharpened output from your model. Aim for diverse examples (e.g., text, faces, natural scenes).
@@ -82,7 +81,7 @@ Showcase a clear comparison between the original blurry input images and the sha
 ## Project Structure 📁
 
 The project follows a modular structure to keep components organized. This tree-like representation is the standard and most effective way to display directory structures in a GitHub README:
-<image>
+![Project Structure](GoPro_dataset/train/Screenshot 2025-07-12 130839.png)
 
 ## Setup and Installation 🛠️
 
