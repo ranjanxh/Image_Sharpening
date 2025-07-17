@@ -82,7 +82,7 @@ Showcase a clear comparison between the original blurry input images and the sha
 
 The project follows a modular structure to keep components organized. This tree-like representation is the standard and most effective way to display directory structures in a GitHub README:
 
-![Project Structure](GoPro_dataset/train/Screenshot%2025-07-12%130839.png)
+![Project Structure](GoPro_dataset/train/project_structure.png)
 
 ## Setup and Installation 🛠️
 
