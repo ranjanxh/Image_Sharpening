@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Jupyter (no notebooks exist in this repo as of writing, but legacy/ or
+# future work might add some)
+.ipynb_checkpoints/
+
+# Local config overrides / secrets (none exist as of writing; convention
+# for anything added later)
+.env
+.env.*
+configs/*.local.yaml
+configs/local_*.yaml
+
+# --- Data & training artifacts -- regenerate rather than commit ---
+#
+# IMPORTANT: everything below was ALREADY COMMITTED to git history before
+# this .gitignore existed (see KNOWLEDGE_BASE.md and the git-history audit
+# for exact sizes). Adding these patterns only stops *new* files under
+# these paths from being tracked going forward -- it does NOT remove the
+# ~2GB already sitting in git history/objects. Untracking + rewriting
+# history (git rm --cached + filter-repo/BFG) is a deliberate decision for
+# whoever owns the `origin` remote, not something to do silently.
+
+GoPro_dataset/
+inference_samples/
+model_checkpoints/
+logs/
+results/
+temp_fps_files/
+*.onnx
+
+# Restormer submodule pretrained weights -- technically already excluded
+# from THIS repo's history because Restormer/ is tracked as a submodule
+# gitlink (its own separate repo), not as regular files here. Listed
+# explicitly anyway as defense-in-depth in case the submodule is ever
+# de-initialized and its contents accidentally copied in as plain files.
+Restormer/**/pretrained_models/*.pth
+
+# OS / editor cruft
+.DS_Store

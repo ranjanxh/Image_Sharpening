@@ -1,7 +1,16 @@
+# NOTE: this is the original monolithic script, kept for historical
+# reference only. It has been superseded by the modular package under
+# src/ (see README.md and KNOWLEDGE_BASE.md). Only the two fatal bugs
+# (missing `import sys`, and the undefined teacher_e2_feat_raw/etc.
+# variable-name mismatch in RestormerTeacherWrapper.forward) were fixed
+# here -- everything else, including the hardcoded Windows path and the
+# encoder_level4 hook that never fires, is unchanged from the original.
+# Do not use this file for new work; use `python -m src.train` instead.
 import os
+import sys
 import shutil
 import torch
-import gc 
+import gc
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
@@ -589,9 +598,9 @@ class RestormerTeacherWrapper(nn.Module):
         teacher_features_e4_raw = self.teacher_features['e4']
         teacher_features_b_raw = self.teacher_features['b']
 
-        teacher_features_e2 = self.proj_e2(teacher_features_e2_raw) if teacher_e2_feat_raw is not None and self.proj_e2 is not None else None
-        teacher_features_e4 = self.proj_e4(teacher_features_e4_raw) if teacher_e4_feat_raw is not None and self.proj_e4 is not None else None
-        teacher_features_b = self.proj_b(teacher_features_b_raw) if teacher_b_feat_raw is not None and self.proj_b is not None else None
+        teacher_features_e2 = self.proj_e2(teacher_features_e2_raw) if teacher_features_e2_raw is not None and self.proj_e2 is not None else None
+        teacher_features_e4 = self.proj_e4(teacher_features_e4_raw) if teacher_features_e4_raw is not None and self.proj_e4 is not None else None
+        teacher_features_b = self.proj_b(teacher_features_b_raw) if teacher_features_b_raw is not None and self.proj_b is not None else None
 
         self.teacher_features = {
             'e2': None,

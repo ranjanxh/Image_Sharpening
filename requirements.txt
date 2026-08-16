@@ -1,0 +1,19 @@
+# Pinned against what was actually installed and verified to run the full
+# pipeline (teacher forward pass with real Restormer weights, student
+# forward/backward, all 5 losses, EMA, scheduler, checkpoint I/O) in this
+# environment on 2026-08-16, CPU-only.
+#
+# GPU users: install torch/torchvision matching your CUDA version instead,
+# e.g.:
+#   pip install torch==2.13.0 torchvision==0.28.0 --index-url https://download.pytorch.org/whl/cu121
+# CPU-only (as verified here):
+#   pip install torch==2.13.0+cpu torchvision==0.28.0+cpu --index-url https://download.pytorch.org/whl/cpu
+
+torch==2.13.0
+torchvision==0.28.0
+numpy==2.5.2
+Pillow==12.3.0
+natsort==8.4.0
+tqdm==4.70.0
+einops==0.8.2
+PyYAML==6.0.3
