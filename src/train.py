@@ -30,29 +30,39 @@ from src.utils import save_checkpoint, set_seed, update_ema
 class MetricsLogger:
     """Appends one row per epoch to both a CSV and a JSON-lines file under
     config.paths.logs_dir, so training curves survive the process exiting
-    (unlike the original script, which only printed to stdout)."""
+    (unlike the original script, which only printed to stdout).
+
+    Fieldnames are a FIXED superset, known up front (not inferred from the
+    first logged row) -- eval-only fields (val_ssim, val_psnr) only appear
+    on eval-interval epochs, but every row still gets every column, with
+    blanks where a value doesn't apply. This is what the original bug got
+    wrong: the header locked in from epoch 1's train-only row, then crashed
+    the moment an eval-epoch row tried to add columns that weren't in the
+    header."""
+
+    FIELDNAMES = [
+        "epoch", "lr",
+        "train_recon_l1", "train_perceptual", "train_feature_distillation",
+        "train_kl_div", "train_ssim", "train_combined",
+        "val_ssim", "val_psnr",
+    ]
 
     def __init__(self, logs_dir: Path, run_name: str):
         logs_dir.mkdir(parents=True, exist_ok=True)
         self.csv_path = logs_dir / f"{run_name}_metrics.csv"
         self.jsonl_path = logs_dir / f"{run_name}_metrics.jsonl"
-        self._csv_fieldnames: list[str] | None = None
 
     def log(self, row: dict) -> None:
         with open(self.jsonl_path, "a") as f:
             f.write(json.dumps(row) + "\n")
 
-        if self._csv_fieldnames is None:
-            self._csv_fieldnames = list(row.keys())
-            write_header = True
-        else:
-            write_header = not self.csv_path.exists()
-
+        write_header = not self.csv_path.exists()
+        full_row = {k: row.get(k, "") for k in self.FIELDNAMES}
         with open(self.csv_path, "a", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=self._csv_fieldnames)
+            writer = csv.DictWriter(f, fieldnames=self.FIELDNAMES)
             if write_header:
                 writer.writeheader()
-            writer.writerow(row)
+            writer.writerow(full_row)
 
 
 def train(config: Config, run_name: str = "student_kd") -> None:
@@ -156,6 +166,9 @@ def train(config: Config, run_name: str = "student_kd") -> None:
         logger.log(row)
         print(f"Epoch {epoch + 1} summary: {row}")
 
+        if (epoch + 1) % config.training.eval_interval == 0 or (epoch + 1) == config.training.num_epochs:
+            save_checkpoint(ema_model, checkpoints_dir / f"{run_name}_ema_latest.pth")
+            save_checkpoint(student, checkpoints_dir / f"{run_name}_raw_latest.pth")
         if (epoch + 1) == config.training.num_epochs:
             save_checkpoint(ema_model, checkpoints_dir / f"{run_name}_ema_final_epoch_{epoch + 1:03d}.pth")
             save_checkpoint(student, checkpoints_dir / f"{run_name}_raw_final_epoch_{epoch + 1:03d}.pth")
