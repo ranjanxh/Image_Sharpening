@@ -1,0 +1,92 @@
+# Default configuration for the Restormer -> U-Net+SE knowledge-distillation
+# image-sharpening pipeline. All paths are relative to the repo root unless
+# absolute; the repo root is resolved at runtime (see src/config.py), so this
+# file is portable across machines/OSes.
+#
+# To point at a different dataset later (e.g. documents/receipts instead of
+# GoPro), only the `data:` section needs to change, as long as the new
+# dataset ships as paired blurred/sharp image directories. Nothing in
+# src/train.py, src/losses.py, or src/models/ needs to change for that swap.
+
+paths:
+  restormer_repo: "Restormer"
+  restormer_weights: "Restormer/Motion_Deblurring/pretrained_models/motion_deblurring.pth"
+  dataset_root: "GoPro_dataset"
+  checkpoints_dir: "model_checkpoints"
+  inference_output_dir: "inference_samples/sharpened_test_outputs"
+  logs_dir: "logs"
+  results_dir: "results"
+
+data:
+  # Dataset-agnostic pairing: any dataset with <root>/<split>/<blurry_subdir>
+  # and <root>/<split>/<sharp_subdir> containing filename-matched pairs works.
+  train_blurry_subdir: "train/blurred"
+  train_sharp_subdir: "train/sharp"
+  test_blurry_subdir: "test/blurred"
+  test_sharp_subdir: "test/sharp"
+  # stem suffixes stripped when matching a blurry filename to its sharp
+  # counterpart (GoPro-specific naming quirk; harmless no-op on datasets
+  # that don't use these suffixes)
+  blurry_stem_suffixes: ["_blurred", "_blur"]
+  sharp_stem_suffixes: ["_sharp"]
+  image_size: [512, 512]
+  batch_size: 1
+  num_workers: 0
+  gaussian_blur_augmentation: true
+
+model:
+  teacher:
+    in_channels: 3
+    out_channels: 3
+    dim: 48
+    num_blocks: [4, 6, 6, 8]
+    num_refinement_blocks: 4
+    heads: [1, 2, 4, 8]
+    ffn_expansion_factor: 2.66
+    bias: false
+    layer_norm_type: "WithBias"
+    dual_pixel_task: false
+    img_multiple_of: 8
+  student:
+    in_channels: 3
+    out_channels: 3
+    base_channels: 256
+
+losses:
+  # weight for each term in the combined loss
+  weights:
+    recon_l1: 1.0
+    perceptual: 0.01
+    feature_distillation: 1.0
+    kl_div: 0.01
+    ssim: 10.0
+  # independently toggleable per term -- this is what Phase 3's ablation
+  # study switches off/on without touching training code
+  enabled:
+    recon_l1: true
+    perceptual: false
+    feature_distillation: false
+    kl_div: false
+    ssim: true
+  kl_temperature: 4.0
+
+training:
+  num_epochs: 8
+  learning_rate: 0.0002
+  gradient_accumulation_steps: 4
+  log_interval: 10
+  eval_interval: 5
+  ema_decay: 0.999
+  seed: 42
+  scheduler:
+    t_0: 10
+    t_mult: 2
+    eta_min: 0.000001
+
+inference:
+  target_output_resolution: [1920, 1080]
+  use_tiling: true
+  tiling_patch_size: 512
+  tiling_overlap: 64
+
+device: "auto"  # auto | cpu | cuda
