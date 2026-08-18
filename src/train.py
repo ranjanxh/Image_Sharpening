@@ -30,35 +30,48 @@ from src.utils import save_checkpoint, set_seed, update_ema
 class MetricsLogger:
     """Appends one row per epoch to both a CSV and a JSON-lines file under
     config.paths.logs_dir, so training curves survive the process exiting
-    (unlike the original script, which only printed to stdout)."""
+    (unlike the original script, which only printed to stdout).
+
+    Fieldnames are a FIXED superset, known up front (not inferred from the
+    first logged row) -- eval-only fields (val_ssim, val_psnr) only appear
+    on eval-interval epochs, but every row still gets every column, with
+    blanks where a value doesn't apply. This is what the original bug got
+    wrong: the header locked in from epoch 1's train-only row, then crashed
+    the moment an eval-epoch row tried to add columns that weren't in the
+    header."""
+
+    FIELDNAMES = [
+        "epoch", "lr",
+        "train_recon_l1", "train_perceptual", "train_feature_distillation",
+        "train_kl_div", "train_ssim", "train_combined",
+        "val_ssim", "val_psnr",
+    ]
 
     def __init__(self, logs_dir: Path, run_name: str):
         logs_dir.mkdir(parents=True, exist_ok=True)
         self.csv_path = logs_dir / f"{run_name}_metrics.csv"
         self.jsonl_path = logs_dir / f"{run_name}_metrics.jsonl"
-        self._csv_fieldnames: list[str] | None = None
 
     def log(self, row: dict) -> None:
         with open(self.jsonl_path, "a") as f:
             f.write(json.dumps(row) + "\n")
 
-        if self._csv_fieldnames is None:
-            self._csv_fieldnames = list(row.keys())
-            write_header = True
-        else:
-            write_header = not self.csv_path.exists()
-
+        write_header = not self.csv_path.exists()
+        full_row = {k: row.get(k, "") for k in self.FIELDNAMES}
         with open(self.csv_path, "a", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=self._csv_fieldnames)
+            writer = csv.DictWriter(f, fieldnames=self.FIELDNAMES)
             if write_header:
                 writer.writeheader()
-            writer.writerow(row)
+            writer.writerow(full_row)
 
 
-def train(config: Config, run_name: str = "student_kd") -> None:
+def train(config: Config, run_name: str = "student_kd", resume_from: str | None = None,
+          start_epoch: int = 0, grad_clip_norm: float = 1.0) -> None:
     set_seed(config.training.seed)
     device = resolve_device(config.device)
     print(f"Device: {device}")
+    if grad_clip_norm:
+        print(f"Gradient clipping enabled: max_norm={grad_clip_norm}")
 
     train_loader = build_dataloader(config, "train")
     test_loader = build_dataloader(config, "test", shuffle=False)
@@ -80,16 +93,29 @@ def train(config: Config, run_name: str = "student_kd") -> None:
         T_mult=config.training.scheduler.t_mult,
         eta_min=config.training.scheduler.eta_min,
     )
+    if start_epoch > 0:
+        scheduler.step(start_epoch)
+        print(f"Scheduler fast-forwarded to epoch {start_epoch}, lr={optimizer.param_groups[0]['lr']:.6f}")
     ema_model = build_student(config.model.student).to(device)
     ema_model.load_state_dict(student.state_dict())
     ema_model.eval()
+
+    if resume_from:
+        print(f"Resuming from checkpoint: {resume_from}")
+        state = torch.load(resume_from, map_location=device)
+        student.load_state_dict(state)
+        ema_model.load_state_dict(state)
+        print("NOTE: optimizer momentum and EMA history are NOT restored from "
+              "checkpoint (only saved model weights are) -- this is a deliberate, "
+              "documented simplification, not a bug. Training resumes from the "
+              "correct model weights but with fresh optimizer/EMA state.")
 
     logger = MetricsLogger(config.resolve(config.paths.logs_dir), run_name)
     checkpoints_dir = config.resolve(config.paths.checkpoints_dir)
     grad_accum = config.training.gradient_accumulation_steps
 
     student.train()
-    for epoch in range(config.training.num_epochs):
+    for epoch in range(start_epoch, config.training.num_epochs):
         epoch_totals = {"recon_l1": 0.0, "perceptual": 0.0, "feature_distillation": 0.0, "kl_div": 0.0, "ssim": 0.0, "combined": 0.0}
         optimizer.zero_grad()
         pbar = tqdm(enumerate(train_loader), total=len(train_loader), desc=f"Epoch {epoch + 1}/{config.training.num_epochs}")
@@ -125,6 +151,8 @@ def train(config: Config, run_name: str = "student_kd") -> None:
             (combined_loss / grad_accum).backward()
 
             if (batch_idx + 1) % grad_accum == 0:
+                if grad_clip_norm:
+                    torch.nn.utils.clip_grad_norm_(student.parameters(), max_norm=grad_clip_norm)
                 optimizer.step()
                 update_ema(ema_model, student, config.training.ema_decay)
                 optimizer.zero_grad()
@@ -137,6 +165,8 @@ def train(config: Config, run_name: str = "student_kd") -> None:
                 pbar.set_postfix({k: f"{float(v.item()):.4f}" for k, v in components.items()})
 
         if len(train_loader) % grad_accum != 0:
+            if grad_clip_norm:
+                torch.nn.utils.clip_grad_norm_(student.parameters(), max_norm=grad_clip_norm)
             optimizer.step()
             update_ema(ema_model, student, config.training.ema_decay)
             optimizer.zero_grad()
@@ -156,6 +186,9 @@ def train(config: Config, run_name: str = "student_kd") -> None:
         logger.log(row)
         print(f"Epoch {epoch + 1} summary: {row}")
 
+        if (epoch + 1) % config.training.eval_interval == 0 or (epoch + 1) == config.training.num_epochs:
+            save_checkpoint(ema_model, checkpoints_dir / f"{run_name}_ema_latest.pth")
+            save_checkpoint(student, checkpoints_dir / f"{run_name}_raw_latest.pth")
         if (epoch + 1) == config.training.num_epochs:
             save_checkpoint(ema_model, checkpoints_dir / f"{run_name}_ema_final_epoch_{epoch + 1:03d}.pth")
             save_checkpoint(student, checkpoints_dir / f"{run_name}_raw_final_epoch_{epoch + 1:03d}.pth")
@@ -168,10 +201,14 @@ def main():
     parser.add_argument("--config", default="configs/default.yaml")
     parser.add_argument("--project-root", default=None)
     parser.add_argument("--run-name", default="student_kd")
+    parser.add_argument("--resume-from", default=None, help="Path to a saved raw student checkpoint to resume from")
+    parser.add_argument("--start-epoch", type=int, default=0, help="Epoch number to resume at (0-indexed count of completed epochs)")
+    parser.add_argument("--grad-clip-norm", type=float, default=1.0, help="Max gradient norm for clipping; 0 disables")
     args = parser.parse_args()
 
     config = load_config(args.config, project_root=args.project_root)
-    train(config, run_name=args.run_name)
+    train(config, run_name=args.run_name, resume_from=args.resume_from,
+          start_epoch=args.start_epoch, grad_clip_norm=args.grad_clip_norm)
 
 
 if __name__ == "__main__":

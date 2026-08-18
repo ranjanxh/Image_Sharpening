@@ -11,7 +11,7 @@
 paths:
   restormer_repo: "Restormer"
   restormer_weights: "Restormer/Motion_Deblurring/pretrained_models/motion_deblurring.pth"
-  dataset_root: "GoPro_dataset"
+  dataset_root: "/workspace/Image_Sharpening_data/gopro_extracted/Gopro"
   checkpoints_dir: "model_checkpoints"
   inference_output_dir: "inference_samples/sharpened_test_outputs"
   logs_dir: "logs"
@@ -20,9 +20,9 @@ paths:
 data:
   # Dataset-agnostic pairing: any dataset with <root>/<split>/<blurry_subdir>
   # and <root>/<split>/<sharp_subdir> containing filename-matched pairs works.
-  train_blurry_subdir: "train/blurred"
+  train_blurry_subdir: "train/blur"
   train_sharp_subdir: "train/sharp"
-  test_blurry_subdir: "test/blurred"
+  test_blurry_subdir: "test/blur"
   test_sharp_subdir: "test/sharp"
   # stem suffixes stripped when matching a blurry filename to its sharp
   # counterpart (GoPro-specific naming quirk; harmless no-op on datasets
@@ -31,7 +31,7 @@ data:
   sharp_stem_suffixes: ["_sharp"]
   image_size: [512, 512]
   batch_size: 1
-  num_workers: 0
+  num_workers: 8
   gaussian_blur_augmentation: true
 
 model:

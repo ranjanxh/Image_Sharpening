@@ -123,11 +123,15 @@ class CombinedLoss(nn.Module):
             components["perceptual"] = zero
 
         if self.enabled.get("feature_distillation", True):
-            pair_losses = [
-                self.feature_l1(s_feat, t_feat)
-                for s_feat, t_feat in zip(student_feats, teacher_feats)
-                if s_feat is not None and t_feat is not None
-            ]
+            pair_losses = []
+            for s_feat, t_feat in zip(student_feats, teacher_feats):
+                if s_feat is None or t_feat is None:
+                    continue
+                if s_feat.shape[2:] != t_feat.shape[2:]:
+                    s_feat = F.interpolate(
+                        s_feat, size=t_feat.shape[2:], mode="bilinear", align_corners=False
+                    )
+                pair_losses.append(self.feature_l1(s_feat, t_feat))
             feat_dist = sum(pair_losses) / len(pair_losses) if pair_losses else zero
             components["feature_distillation"] = feat_dist
             total = total + self.weights["feature_distillation"] * feat_dist
